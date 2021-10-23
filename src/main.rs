@@ -2,6 +2,13 @@ use std::io;
 use rand::Rng;
 
 
+struct Hand {
+    total: u8,
+    num_cards: u8,
+    has_ace: bool,
+    cards: Vec<String>
+}
+
 fn main() {
     println!("Welcome to blackjack!");
     println!("How many decks would you like to play with?");
@@ -12,42 +19,70 @@ fn main() {
         .read_line(&mut num_decks)
         .expect("Failed to read line");
 
-    let num_decks:u8 = num_decks.trim().parse().expect("Please type a number");
+    let num_decks:u8 = num_decks.trim().parse().expect("Please type a number\n");
     // let mut hit:bool = true;
-    let mut player_hand: Vec<String> = Vec::new();
-    let mut deal_hand: Vec<String> = Vec::new();
-    let mut player_total = 0;
-    let mut dealer_total = 0;
-    
+
+    let mut player_hand = Hand {
+        total: 0,
+        num_cards: 0,
+        has_ace: false,
+        cards: Vec::new()
+    };
+
+    let mut dealer_hand = Hand {
+        total: 0,
+        num_cards: 0,
+        has_ace: false,
+        cards: Vec::new()
+    };
     for turn in 0..4{
         if turn % 2 == 0{
-            player_total += draw_card(num_decks, &mut player_hand);
-            println!("You drew {}", player_hand[turn / 2]);
-            println!("Your hand total: {}", player_total)
+            draw_card(num_decks, &mut player_hand);
+            println!("You drew {}", player_hand.cards[turn / 2]);
+            println!("Your hand total: {}", player_hand.total)
         }else {
-            dealer_total += draw_card(num_decks, &mut deal_hand);
-            println!("Dealer drew {}", deal_hand[turn / 2]);
-            println!("Your hand total: {}", dealer_total)
+            draw_card(num_decks, &mut dealer_hand);
+            println!("Dealer drew {}", dealer_hand.cards[turn / 2]);
+            println!("Your hand total: {}", dealer_hand.total)
         }
         println!("")
     }
 
-    
+    // while hit && player_total < 21 && dealer_total < 21 {
+        
+    // }
 }
 
 
-fn draw_card(num_decks: u8, hand: &mut Vec<String>) -> u8 {
+fn draw_card(num_decks: u8, hand: & mut Hand) {
     let deck:u8 = rand::thread_rng().gen_range(0..num_decks);
     let suit:u8 = rand::thread_rng().gen_range(0..4);
-    let rank:u8 = rand::thread_rng().gen_range(1..14);
+    let mut rank:u8 = rand::thread_rng().gen_range(1..14);
 
     let mut card = String::from("");
 
     match rank {
-        1 => card.push_str("Ace"),
-        11 => card.push_str("Prince"),
-        12 => card.push_str("Queen"),
-        13 => card.push_str("King"),
+        1 => {
+            if hand.total > 10 {
+                rank = 1;
+            }else {
+                rank = 11;
+            }
+            hand.has_ace = true;
+            card.push_str("Ace");
+        },
+        11 => {
+            rank = 10;
+            card.push_str("Prince");
+        },
+        12 => {
+            rank = 10;
+            card.push_str("Queen");
+        },
+        13 => {
+            rank = 10;
+            card.push_str("King");
+        },
         other => card.push_str(&other.to_string())
     }
     
@@ -62,11 +97,8 @@ fn draw_card(num_decks: u8, hand: &mut Vec<String>) -> u8 {
     let mut card_with_deck_number = card.clone();
     card_with_deck_number.push_str(&deck.to_string());
     
-    println!("{}", card);
 
-    hand.push(card);
-    if rank > 10 {
-        return 10;
-    }
-    rank
+    hand.cards.push(card);
+    hand.total += rank;
+    hand.num_cards += 1;
 }
