@@ -13,17 +13,33 @@ fn main() {
         .expect("Failed to read line");
 
     let num_decks:u8 = num_decks.trim().parse().expect("Please type a number");
+    // let mut hit:bool = true;
+    let mut player_hand: Vec<String> = Vec::new();
+    let mut deal_hand: Vec<String> = Vec::new();
+    let mut player_total = 0;
+    let mut dealer_total = 0;
     
-    draw_card(num_decks)
+    for turn in 0..4{
+        if turn % 2 == 0{
+            player_total += draw_card(num_decks, &mut player_hand);
+            println!("You drew {}", player_hand[turn / 2]);
+            println!("Your hand total: {}", player_total)
+        }else {
+            dealer_total += draw_card(num_decks, &mut deal_hand);
+            println!("Dealer drew {}", deal_hand[turn / 2]);
+            println!("Your hand total: {}", dealer_total)
+        }
+        println!("")
+    }
+
+    
 }
 
 
-fn draw_card(num_decks: u8) {
+fn draw_card(num_decks: u8, hand: &mut Vec<String>) -> u8 {
     let deck:u8 = rand::thread_rng().gen_range(0..num_decks);
-    let suit:u8 = rand::thread_rng().gen_range(0..=3);
+    let suit:u8 = rand::thread_rng().gen_range(0..4);
     let rank:u8 = rand::thread_rng().gen_range(1..14);
-
-    println!("{} {} {}", rank, suit, deck);
 
     let mut card = String::from("");
 
@@ -43,8 +59,14 @@ fn draw_card(num_decks: u8) {
         _ => card.push_str(" of Clubs"),
     }
 
-    card.push_str(&deck.to_string());
+    let mut card_with_deck_number = card.clone();
+    card_with_deck_number.push_str(&deck.to_string());
     
     println!("{}", card);
-    // cards_drawn.insert(card, true);
+
+    hand.push(card);
+    if rank > 10 {
+        return 10;
+    }
+    rank
 }
