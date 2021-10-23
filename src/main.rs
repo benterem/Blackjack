@@ -12,6 +12,8 @@ struct Hand {
 fn main() {
     println!("Welcome to blackjack!");
     println!("How many decks would you like to play with?");
+    println!("Please enter a number between 6 and 10. The value will default to 6.");
+    println!("");
 
     let mut num_decks = String::new();
 
@@ -19,7 +21,15 @@ fn main() {
         .read_line(&mut num_decks)
         .expect("Failed to read line");
 
-    let num_decks:u8 = num_decks.trim().parse().expect("Please type a number\n");
+    
+    let mut num_decks:u8 = match num_decks.trim().parse() {
+        Ok(num) => num,
+        Err(_) => 6,
+    };
+
+    if num_decks < 1 || num_decks > 10 {
+        num_decks = 6;
+    }
     // let mut hit:bool = true;
 
     let mut player_hand = Hand {
@@ -102,3 +112,7 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     hand.total += rank;
     hand.num_cards += 1;
 }
+
+// fn dealer_decision(dealer_hand: & mut Hand, player_hand:&Hand) {
+    
+// }
