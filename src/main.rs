@@ -13,7 +13,6 @@ fn main() {
     println!("Welcome to blackjack!");
     println!("How many decks would you like to play with?");
     println!("Please enter a number between 6 and 10. The value will default to 6.");
-    println!("");
 
     let mut num_decks = String::new();
 
@@ -45,15 +44,21 @@ fn main() {
         has_ace: false,
         cards: Vec::new()
     };
+
+    println!("");
     for turn in 0..4{
         if turn % 2 == 0{
             draw_card(num_decks, &mut player_hand);
-            println!("You drew {}", player_hand.cards[turn / 2]);
-            println!("Your hand total: {}", player_hand.total)
+            println!("You drew: {}", player_hand.cards[turn / 2]);
+            println!("Your hand total: {}", player_hand.total);
+            if player_hand.total == 21 {
+                println!("Congradulations!, You've won!")
+            };
+        }else if turn == 1{
+            draw_card(num_decks, &mut dealer_hand);
+            println!("Dealer's face up card is: {}", dealer_hand.cards[0]);
         }else {
             draw_card(num_decks, &mut dealer_hand);
-            println!("Dealer drew {}", dealer_hand.cards[turn / 2]);
-            println!("Your hand total: {}", dealer_hand.total)
         }
         println!("")
     }
