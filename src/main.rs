@@ -6,6 +6,7 @@ struct Hand {
     total: u8,
     num_cards: u8,
     has_ace: bool,
+    num_aces: u8,
     cards: Vec<String>
 }
 
@@ -35,6 +36,7 @@ fn main() {
         total: 0,
         num_cards: 0,
         has_ace: false,
+        num_aces: 0,
         cards: Vec::new()
     };
 
@@ -42,6 +44,7 @@ fn main() {
         total: 0,
         num_cards: 0,
         has_ace: false,
+        num_aces: 0,
         cards: Vec::new()
     };
 
@@ -78,12 +81,8 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
 
     match rank {
         1 => {
-            if hand.total > 10 {
-                rank = 1;
-            }else {
-                rank = 11;
-            }
             hand.has_ace = true;
+            rank = 11;
             card.push_str("Ace");
         },
         11 => {
