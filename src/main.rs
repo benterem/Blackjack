@@ -53,6 +53,8 @@ fn main() {
         if turn % 2 == 0{
             draw_card(num_decks, &mut player_hand);
             println!("You drew: {}", player_hand.cards[turn / 2]);
+
+
             println!("Your hand total: {}", player_hand.total);
             if player_hand.total == 21 {
                 println!("Congradulations!, You've won!")
@@ -81,6 +83,7 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
 
     match rank {
         1 => {
+            hand.num_aces += 1;
             hand.has_ace = true;
             rank = 11;
             card.push_str("Ace");
@@ -111,11 +114,18 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     let mut card_with_deck_number = card.clone();
     card_with_deck_number.push_str(&deck.to_string());
     
-
     hand.cards.push(card);
-    hand.total += rank;
     hand.num_cards += 1;
+
+    //calculate hand total
+    if hand.total + rank > 21 && hand.has_ace {
+        hand.total = hand.total + rank - 10;
+    }else {
+        hand.total += rank;
+    }
 }
+
+// fn choose_ace_value {}
 
 // fn dealer_decision(dealer_hand: & mut Hand, player_hand:&Hand) {
     
