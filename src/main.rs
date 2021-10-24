@@ -170,15 +170,12 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     hand.num_cards += 1;
 
     //calculate hand total
-    // if hand.total + rank > 21 && hand.has_ace && rank == 11{
-    //     hand.total = hand.total + rank - 10;
-    // }else {
-    //     hand.total += rank;
-    // }
-    hand.total += rank;
+    if hand.total + rank > 21 && hand.has_ace {
+        hand.total = hand.total + rank - 10;
+    }else {
+        hand.total += rank;
+    }
 }
-
-// fn choose_ace_value {}
 
 // fn dealer_decision(dealer_hand: & mut Hand, player_hand:&Hand) {
     
