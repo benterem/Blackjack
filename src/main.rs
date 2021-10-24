@@ -48,6 +48,7 @@ fn main() {
         cards: Vec::new()
     };
     
+    let mut hit:bool = true;
     //Initial Draw
     println!("");
     for turn in 0..4{
@@ -67,7 +68,6 @@ fn main() {
         println!("")
     }
     
-    let mut hit:bool = true;
     let mut draw_number:usize = 1;
     while hit {
         
@@ -124,6 +124,32 @@ fn main() {
                     continue
                 },
             }
+        }
+    }
+
+    println!("Dealer flips face down card:");
+    println!("Dealer's hand:");
+    for card in &dealer_hand.cards{
+        println!("{}", card);
+    }
+    println!("Dealer's total: {}", &dealer_hand.total);
+
+    //dealer's play
+    while dealer_hand.total < 21 {
+        draw_card(num_decks, & mut dealer_hand);
+
+        let dealer_total = dealer_hand.total;
+
+        if dealer_total < 17 {
+            continue;
+        }else if dealer_total < 21 {
+            break;
+        }else if dealer_total == 21 {
+            println!("Dealer got 21");
+            break;
+        }else {
+            println!("Dealer lost!");
+            break;
         }
     }
 }
