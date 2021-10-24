@@ -7,7 +7,7 @@ struct Hand {
     num_cards: u8,
     //will not need both fields
     has_ace: bool,
-    num_aces: u8,
+    ace_reduced: bool,
     cards: Vec<String>
 }
 
@@ -36,7 +36,7 @@ fn main() {
         total: 0,
         num_cards: 0,
         has_ace: false,
-        num_aces: 0,
+        ace_reduced: false,
         cards: Vec::new()
     };
     
@@ -44,7 +44,7 @@ fn main() {
         total: 0,
         num_cards: 0,
         has_ace: false,
-        num_aces: 0,
+        ace_reduced: false,
         cards: Vec::new()
     };
     
@@ -75,7 +75,12 @@ fn main() {
         draw_number += 1;
         let hand_total = player_hand.total;
 
-        println!("You drew: {}", player_hand.cards[draw_number]);
+        println!("You drew: {}", &player_hand.cards[draw_number]);
+        println!("Your hand:");
+        for card in &player_hand.cards {
+            println!("{}", card);
+        }
+        println!("");
         
         if hand_total > 21 {
             println!("BUST! your hand total is {}, over 21. You lose!", hand_total);
@@ -88,7 +93,7 @@ fn main() {
         }
 
         print!("Your hand total: ");
-        if player_hand.has_ace {
+        if player_hand.ace_reduced{
             println!("soft {}", hand_total);
         }else{
             println!("{}", hand_total)
@@ -108,12 +113,10 @@ fn main() {
             match player_decision.to_lowercase().trim() {
                 "hit" => {
                     hit = true;
-                    println!("will leave");
                     break;
                 },
                 "stand" => {
                     hit = false;
-                    println!("will leave");
                     break;
                 },
                 _ => {
@@ -130,12 +133,12 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     let deck:u8 = rand::thread_rng().gen_range(0..num_decks);
     let suit:u8 = rand::thread_rng().gen_range(0..4);
     let mut rank:u8 = rand::thread_rng().gen_range(1..14);
-
+    let mut ace:bool = false;
     let mut card = String::from("");
 
     match rank {
         1 => {
-            hand.num_aces += 1;
+            ace = true;
             hand.has_ace = true;
             rank = 11;
             card.push_str("Ace");
@@ -170,8 +173,11 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     hand.num_cards += 1;
 
     //calculate hand total
-    if hand.total + rank > 21 && hand.has_ace {
+    if hand.total + rank > 21 && ace {
+        hand.total = hand.total + 1;
+    }else if hand.total + rank > 21 && !hand.ace_reduced && hand.has_ace{
         hand.total = hand.total + rank - 10;
+        hand.ace_reduced = true;
     }else {
         hand.total += rank;
     }
