@@ -5,6 +5,7 @@ use rand::Rng;
 struct Hand {
     total: u8,
     num_cards: u8,
+    //will not need both fields
     has_ace: bool,
     num_aces: u8,
     cards: Vec<String>
@@ -30,8 +31,7 @@ fn main() {
     if num_decks < 1 || num_decks > 10 {
         num_decks = 6;
     }
-    // let mut hit:bool = true;
-
+    
     let mut player_hand = Hand {
         total: 0,
         num_cards: 0,
@@ -39,7 +39,7 @@ fn main() {
         num_aces: 0,
         cards: Vec::new()
     };
-
+    
     let mut dealer_hand = Hand {
         total: 0,
         num_cards: 0,
@@ -47,14 +47,13 @@ fn main() {
         num_aces: 0,
         cards: Vec::new()
     };
-
+    
+    //Initial Draw
     println!("");
     for turn in 0..4{
         if turn % 2 == 0{
             draw_card(num_decks, &mut player_hand);
             println!("You drew: {}", player_hand.cards[turn / 2]);
-
-
             println!("Your hand total: {}", player_hand.total);
             if player_hand.total == 21 {
                 println!("Congradulations!, You've won!")
@@ -67,10 +66,63 @@ fn main() {
         }
         println!("")
     }
-
-    // while hit && player_total < 21 && dealer_total < 21 {
+    
+    let mut hit:bool = true;
+    let mut draw_number:usize = 1;
+    while hit {
         
-    // }
+        draw_card(num_decks, &mut player_hand);
+        draw_number += 1;
+        let hand_total = player_hand.total;
+
+        println!("You drew: {}", player_hand.cards[draw_number]);
+        
+        if hand_total > 21 {
+            println!("BUST! your hand total is {}, over 21. You lose!", hand_total);
+            break;
+        }
+        
+        if hand_total == 21 {
+            println!("21!!!!! YOU WON!!!!");
+            break;
+        }
+
+        print!("Your hand total: ");
+        if player_hand.has_ace {
+            println!("soft {}", hand_total);
+        }else{
+            println!("{}", hand_total)
+        }
+
+        println!("Hit or Stand?");
+
+        loop{
+            let mut player_decision = String::new();
+
+            io::stdin()
+                .read_line(&mut player_decision)
+                .expect("Failed to read line");
+            
+            println!("{}", player_decision);
+
+            match player_decision.to_lowercase().trim() {
+                "hit" => {
+                    hit = true;
+                    println!("will leave");
+                    break;
+                },
+                "stand" => {
+                    hit = false;
+                    println!("will leave");
+                    break;
+                },
+                _ => {
+                    println!("Please enter \"hit\" or \"stand\"");
+                    continue
+                },
+            }
+        }
+    }
 }
 
 
@@ -118,11 +170,12 @@ fn draw_card(num_decks: u8, hand: & mut Hand) {
     hand.num_cards += 1;
 
     //calculate hand total
-    if hand.total + rank > 21 && hand.has_ace {
-        hand.total = hand.total + rank - 10;
-    }else {
-        hand.total += rank;
-    }
+    // if hand.total + rank > 21 && hand.has_ace && rank == 11{
+    //     hand.total = hand.total + rank - 10;
+    // }else {
+    //     hand.total += rank;
+    // }
+    hand.total += rank;
 }
 
 // fn choose_ace_value {}
