@@ -3,9 +3,8 @@ use rand::Rng;
 use std::collections::HashMap;
 
 //TODO:
-// 1) Add hashmap for cards drawn
-// 2) Add loop for multiple rounds
-// 3) OPTIONAL: Add betting
+// 1) refractor into modular code
+// 2) OPTIONAL: Add betting
 struct Hand {
     total: u16,
     num_cards: u8,
@@ -213,25 +212,27 @@ fn main() {
             println!("Player wins!")
         }
 
+        println!("");
         println!("Another round?");
-        println!("Print \"yes\" to continue");
+        println!("Enter \"yes\" to continue");
 
         let mut play_again = String::new();
 
-            io::stdin()
-                .read_line(&mut play_again)
-                .expect("Failed to read line");
+        io::stdin()
+            .read_line(&mut play_again)
+            .expect("Failed to read line");
 
-            match play_again.to_lowercase().trim() {
-                "yes" => {
-                    println!("");
-                    println!("Awesome! Dealing the cards!");
-                },
-                _ => {
-                    println!("Good-bye!");
-                    break;
-                }
+        match play_again.to_lowercase().trim() {
+            "yes" => {
+                println!("");
+                println!("Awesome! Dealing the cards!");
+            },
+            _ => {
+                println!("");
+                println!("Good-bye!");
+                break;
             }
+        }
     }
 }
 
