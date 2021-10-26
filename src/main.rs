@@ -35,7 +35,6 @@ fn main() {
     
     //Start of game
     loop{        
-
         let mut player_hand = Hand {
             total: 0,
             num_cards: 0,
