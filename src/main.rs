@@ -37,7 +37,7 @@ fn main() {
     }
     
     
-    //Initial Dra
+    //Start of game
 
     loop{        
 
@@ -62,38 +62,56 @@ fn main() {
         // boolean for palyers turn
         let mut hit:bool = true;
 
-        println!("");
         for turn in 0..4{
             if turn % 2 == 0{
                 draw_card(& mut cards_drawn, num_decks, &mut player_hand);
-                println!("You drew: {}", player_hand.cards[turn / 2]);
+                println!("\nYou drew: {}", player_hand.cards[turn / 2]);
                 if player_hand.total == 21 {
-                    println!("Congradulations!, You've won!");
                     hit = false;
                 };
             }else if turn == 1{
                 draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
-                println!("Dealer's face up card is: {}", dealer_hand.cards[0]);
+                println!("\nDealer's face up card is: {}", dealer_hand.cards[0]);
             }else {
                 draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
             }
-            println!("")
         }
         
-        println!("Your hand:");
-        for card in &player_hand.cards {
-            println!("{}", card);
-        }
-        println!("");
-        println!("Your hand total: {}", &player_hand.total);
-        println!("");
+        // println!("\nYour hand:");
+        // for card in &player_hand.cards {
+        //     println!("{}", card);
+        // }
+        // println!("\nYour hand total: {}", &player_hand.total);
 
         let mut draw_number:usize = 1;
         
         //player's turn
-        while hit {
+        while hit {  
+            let hand_total = player_hand.total;
 
-            println!("Hit or Stand?");
+            if hand_total > 21 {
+                println!("\nBUST! your hand total is {}.", hand_total);
+                draw_number = 1;
+                break;
+            }
+            
+            if hand_total == 21 {
+                break;
+            }
+
+                println!("\nYour hand:");
+            for card in &player_hand.cards {
+                println!("{}", card);
+            }
+            
+                print!("\nYour hand total: ");
+            if player_hand.has_ace && player_hand.ace_reduced{
+                println!("soft {}", hand_total);
+            }else{
+                println!("{}", hand_total)
+            }
+
+            println!("\nHit or Stand?");
 
             let mut player_decision = String::new();
 
@@ -115,45 +133,15 @@ fn main() {
 
             draw_card(& mut cards_drawn, num_decks, &mut player_hand);
             draw_number += 1;
-            let hand_total = player_hand.total;
-            
-            println!("");
-            println!("You drew: {}", &player_hand.cards[draw_number]);
-
-            
-            if hand_total > 21 {
-                println!("BUST! your hand total is {}.", hand_total);
-                draw_number = 1;
-                break;
-            }
-            
-            if hand_total == 21 {
-                break;
-            }
-
-            println!("");
-            println!("Your hand:");
-            for card in &player_hand.cards {
-                println!("{}", card);
-            }
-            
-            println!("");
-            print!("Your hand total: ");
-            if player_hand.ace_reduced{
-                println!("soft {}", hand_total);
-            }else{
-                println!("{}", hand_total)
-            }
+            println!("\nYou drew: {}", &player_hand.cards[draw_number]);
         }
 
-        println!("");
-        println!("Dealer flips face down card");
-        println!("");
+        println!("\nDealer flips face down card");
         println!("Dealer's hand:");
         for card in &dealer_hand.cards{
             println!("{}", card);
         }
-        println!("Dealer's total: {}", &dealer_hand.total);
+        println!("\nDealer's total: {}", &dealer_hand.total);
         
 
         //dealer's play
@@ -163,26 +151,24 @@ fn main() {
 
             let dealer_total = dealer_hand.total;
 
-            println!("");
-            println!("Dealer drew: {}", &dealer_hand.cards[draw_number]);
+            println!("\nDealer drew: {}", &dealer_hand.cards[draw_number]);
             draw_number+=1;
 
-            println!("");
-            println!("Dealer's hand:");
+            println!("\nDealer's hand:");
             for card in &dealer_hand.cards{
                 println!("{}", card);
             }
-            println!("Dealer's total: {}", &dealer_hand.total);
+            println!("\nDealer's total: {}", &dealer_hand.total);
             
             if dealer_total < 17 {
                 continue;
             }else if dealer_total < 21 {
                 break;
             }else if dealer_total == 21 {
-                println!("Dealer got 21");
+                println!("\nDealer got 21");
                 break;
             }else {
-                println!("Dealer lost!");
+                println!("\nDealer lost!");
                 break;
             }
 
@@ -193,27 +179,25 @@ fn main() {
         let dealer=dealer_hand.total;
 
 
-        println!("");
         if dealer < 21 && player < 21 {
             if player > dealer {
-                println!("Player wins!");
+                println!("\nPlayer wins!");
             }else if player < dealer {
-                println!("Dealer wins")
+                println!("\nDealer wins")
             }else {
-                println!("Draw")
+                println!("\nDraw")
             }
         }else if player == 21{
-            println!("21!!!!! YOU WON!!!!");
+            println!("\n21!!!!! YOU WON!!!!");
         }else if dealer > 21 && player > 21{
-            println!("Draw")
+            println!("\nDraw")
         }else if dealer == 21 || player > 21{
-            println!("Dealer wins");
+            println!("\nDealer wins");
         } else {
-            println!("Player wins!")
+            println!("\nPlayer wins!")
         }
 
-        println!("");
-        println!("Another round?");
+        println!("\nAnother round?");
         println!("Enter \"yes\" to continue");
 
         let mut play_again = String::new();
@@ -224,12 +208,10 @@ fn main() {
 
         match play_again.to_lowercase().trim() {
             "yes" => {
-                println!("");
-                println!("Awesome! Dealing the cards!");
+                println!("\nAwesome! Dealing the cards!");
             },
             _ => {
-                println!("");
-                println!("Good-bye!");
+                println!("\nGood-bye!");
                 break;
             }
         }
