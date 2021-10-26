@@ -2,13 +2,9 @@ use std::io;
 use rand::Rng;
 use std::collections::HashMap;
 
-//TODO:
-// 1) refractor into modular code
-// 2) OPTIONAL: Add betting
 struct Hand {
     total: u16,
     num_cards: u8,
-    //will not need both fields
     has_ace: bool,
     ace_reduced: bool,
     cards: Vec<String>
@@ -26,7 +22,7 @@ fn main() {
         .read_line(&mut num_decks)
         .expect("Failed to read line");
 
-    
+    //default 
     let mut num_decks:u16 = match num_decks.trim().parse() {
         Ok(num) => num,
         Err(_) => 6
@@ -38,7 +34,6 @@ fn main() {
     
     
     //Start of game
-
     loop{        
 
         let mut player_hand = Hand {
@@ -59,56 +54,44 @@ fn main() {
         
         let mut cards_drawn:HashMap<u16, bool> = HashMap::new();
         
-        // boolean for palyers turn
-        let mut hit:bool = true;
-
+        //original draw
         for turn in 0..4{
             if turn % 2 == 0{
-                draw_card(& mut cards_drawn, num_decks, &mut player_hand);
-                println!("\nYou drew: {}", player_hand.cards[turn / 2]);
-                if player_hand.total == 21 {
-                    hit = false;
-                };
-            }else if turn == 1{
-                draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
-                println!("\nDealer's face up card is: {}", dealer_hand.cards[0]);
-            }else {
-                draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
+                let card = draw_card(& mut cards_drawn, num_decks, &mut player_hand);
+                println!("\nYou drew: {}", card);
+            }else{
+                let card =draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
+                println!("\nDealer's face up card is: {}", card);
+                if turn == 1 {
+                    println!("\nDealer drew: {}", card);
+                }
             }
         }
-        
-        // println!("\nYour hand:");
-        // for card in &player_hand.cards {
-        //     println!("{}", card);
-        // }
-        // println!("\nYour hand total: {}", &player_hand.total);
-
-        let mut draw_number:usize = 1;
-        
+                
         //player's turn
-        while hit {  
+        loop {  
             let hand_total = player_hand.total;
-
-            if hand_total > 21 {
-                println!("\nBUST! your hand total is {}.", hand_total);
-                draw_number = 1;
-                break;
-            }
             
-            if hand_total == 21 {
-                break;
-            }
-
-                println!("\nYour hand:");
+            println!("\nYour hand:");
             for card in &player_hand.cards {
                 println!("{}", card);
             }
             
-                print!("\nYour hand total: ");
-            if player_hand.has_ace && player_hand.ace_reduced{
+            print!("\nYour hand total: ");
+            if hand_total < 21 && player_hand.has_ace && !player_hand.ace_reduced {
                 println!("soft {}", hand_total);
             }else{
                 println!("{}", hand_total)
+            }
+
+            if hand_total > 21 {
+                println!("\nBUST!");
+                break;
+            }
+            
+            if hand_total == 21 {
+
+                break;
             }
 
             println!("\nHit or Stand?");
@@ -122,7 +105,6 @@ fn main() {
             match player_decision.to_lowercase().trim() {
                 "hit" => {},
                 "stand" => {
-                    draw_number = 1;
                     break;
                 },
                 _ => {
@@ -131,70 +113,64 @@ fn main() {
                 },
             }
 
-            draw_card(& mut cards_drawn, num_decks, &mut player_hand);
-            draw_number += 1;
-            println!("\nYou drew: {}", &player_hand.cards[draw_number]);
+            let card = draw_card(& mut cards_drawn, num_decks, &mut player_hand);
+            println!("\nYou drew: {}", card);
         }
 
-        println!("\nDealer flips face down card");
-        println!("Dealer's hand:");
-        for card in &dealer_hand.cards{
-            println!("{}", card);
-        }
-        println!("\nDealer's total: {}", &dealer_hand.total);
-        
 
         //dealer's play
-        while dealer_hand.total < 17 && player_hand.total != 21{
+        println!("\nDealer flips face down card");
 
-            draw_card(& mut cards_drawn, num_decks, & mut dealer_hand);
-
-            let dealer_total = dealer_hand.total;
-
-            println!("\nDealer drew: {}", &dealer_hand.cards[draw_number]);
-            draw_number+=1;
-
-            println!("\nDealer's hand:");
+        if player_hand.total > 21 {
+            println!("Dealer's hand:");
             for card in &dealer_hand.cards{
                 println!("{}", card);
             }
             println!("\nDealer's total: {}", &dealer_hand.total);
-            
-            if dealer_total < 17 {
-                continue;
-            }else if dealer_total < 21 {
-                break;
-            }else if dealer_total == 21 {
-                println!("\nDealer got 21");
-                break;
-            }else {
-                println!("\nDealer lost!");
-                break;
-            }
+        }else{    
+            loop {
 
+                let dealer_total = dealer_hand.total;
+
+                println!("\nDealer's hand:");
+                for card in &dealer_hand.cards{
+                    println!("{}", card);
+                }
+                println!("\nDealer's total: {}", dealer_total);
+                
+                if dealer_total < 17 {
+                    let card = draw_card(& mut cards_drawn, num_decks, & mut dealer_hand);
+                    println!("\nDealer drew: {}", card);
+                }else if dealer_total < 21 {
+                    break;
+                }else if dealer_total == 21 {
+                    println!("\nDealer got 21");
+                    break;
+                }else {
+                    println!("\nDEALER BUST!");
+                    break;
+                }
+            }
         }
 
         // determening a winner
         let player = player_hand.total;
         let dealer=dealer_hand.total;
 
-
-        if dealer < 21 && player < 21 {
-            if player > dealer {
-                println!("\nPlayer wins!");
-            }else if player < dealer {
-                println!("\nDealer wins")
-            }else {
-                println!("\nDraw")
+        if player > 21 {
+            println!("\nDealer wins.");
+        }else if player == 21 {
+            if dealer == 21 {
+                println!("\nDraw.");
+                break;
             }
-        }else if player == 21{
-            println!("\n21!!!!! YOU WON!!!!");
-        }else if dealer > 21 && player > 21{
-            println!("\nDraw")
-        }else if dealer == 21 || player > 21{
-            println!("\nDealer wins");
-        } else {
-            println!("\nPlayer wins!")
+            println!("\n21 YOU WIN!!!!!");
+        }else if dealer > 21 || player > dealer {
+            println!("\nYOU WIN!!!!!");
+        }else if dealer > player {
+            println!("\nDealer wins.");
+        }else {
+            println!("\nDraw.")
         }
 
         println!("\nAnother round?");
@@ -219,7 +195,7 @@ fn main() {
 }
 
 
-fn draw_card(cards_drawn: & mut HashMap<u16, bool>,num_decks: u16, hand: & mut Hand) {
+fn draw_card(cards_drawn: & mut HashMap<u16, bool>,num_decks: u16, hand: & mut Hand) -> String {
     loop {    
         let deck:u16 = rand::thread_rng().gen_range(1..=num_decks);
         let suit:u16 = rand::thread_rng().gen_range(1..5);
@@ -267,10 +243,7 @@ fn draw_card(cards_drawn: & mut HashMap<u16, bool>,num_decks: u16, hand: & mut H
             _ => card.push_str(" of Clubs"),
         }
 
-        let mut card_with_deck_number = card.clone();
-        card_with_deck_number.push_str(&deck.to_string());
-        
-        hand.cards.push(card);
+        hand.cards.push(card.clone());
         hand.num_cards += 1;
 
         //calculate hand total
@@ -278,16 +251,14 @@ fn draw_card(cards_drawn: & mut HashMap<u16, bool>,num_decks: u16, hand: & mut H
         //if the drawn card is an ace, and the new total is > 21, ace counts as 1 
         if hand.total + rank > 21 && ace {
             hand.total = hand.total + 1;
-
+            hand.ace_reduced = true;
         //if the drawn card has rank >= 10, and player has an ace, reduce ace to 1
         }else if hand.total + rank > 21 && !hand.ace_reduced && hand.has_ace{
             hand.total = hand.total + rank - 10;
-            hand.ace_reduced = true;
+            hand.ace_reduced = true
         }else {
             hand.total += rank;
         }
-        break;
-
-
+        return card;
     }
 }
