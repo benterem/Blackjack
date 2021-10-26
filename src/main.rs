@@ -60,9 +60,8 @@ fn main() {
                 println!("\nYou drew: {}", card);
             }else{
                 let card =draw_card(& mut cards_drawn, num_decks, &mut dealer_hand);
-                println!("\nDealer's face up card is: {}", card);
                 if turn == 1 {
-                    println!("\nDealer drew: {}", card);
+                    println!("\nDealer's face up card is: {}", card);
                 }
             }
         }
